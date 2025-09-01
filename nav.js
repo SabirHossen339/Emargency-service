@@ -1,4 +1,5 @@
-et heartCount = 0;
+
+let heartCount = 0;
 let coinCount = 100; 
 let copyCount = 0;
 
@@ -64,7 +65,7 @@ copyButtons.forEach(buttonId => {
                 
                 navigator.clipboard.writeText(service.number).then(function() {
                     
-                    alert(${service.name} number "${service.number}" has been copied to clipboard!);
+                    alert(`${service.name} number "${service.number}" has been copied to clipboard!`);
                     
                     
                     copyCount++;
@@ -78,7 +79,7 @@ copyButtons.forEach(buttonId => {
                     document.execCommand('copy');
                     document.body.removeChild(textArea);
                     
-                    alert(${service.name} number "${service.number}" has been copied to clipboard!);
+                    alert(`${service.name} number "${service.number}" has been copied to clipboard!`);
                     copyCount++;
                     copyCountElement.textContent = copyCount;
                 });
@@ -112,7 +113,7 @@ callButtons.forEach(buttonId => {
                 coinCountElement.textContent = coinCount;
                 
                 
-                alert(Calling ${service.name} at ${service.number}. Call cost: 20 coins. Remaining coins: ${coinCount});
+                alert(`Calling ${service.name} at ${service.number}. Call cost: 20 coins. Remaining coins: ${coinCount}`);
                 
                
                 addToCallHistory(service);
@@ -139,4 +140,61 @@ function addToCallHistory(service) {
     
     historyItem.innerHTML = `
         <div class="flex justify-between items-start">
-            <div class="flex-1">
+            <div class="flex-1">
+                <h3 class="font-semibold text-sm text-gray-800">${service.name}</h3>
+                <p class="text-green-600 font-mono text-sm">${service.number}</p>
+                <p class="text-xs text-gray-500 mt-1">
+                    <i class="fa-regular fa-clock mr-1"></i>${timeString}
+                </p>
+            </div>
+            <div class="ml-2">
+                <i class="fa-solid fa-phone text-green-500 text-sm"></i>
+            </div>
+        </div>
+    `;
+    
+    // Add to top of call history
+    callHistoryElement.insertBefore(historyItem, callHistoryElement.firstChild);
+    
+    // Show message if this is the first call
+    if (callHistoryElement.children.length === 1) {
+        // Remove any "no calls" message if it exists
+        const noCallsMessage = callHistoryElement.querySelector('.no-calls-message');
+        if (noCallsMessage) {
+            noCallsMessage.remove();
+        }
+    }
+}
+
+// Clear history button event listener
+clearHistoryButton.addEventListener('click', function() {
+    if (callHistoryElement.children.length === 0) {
+        alert('Call history is already empty!');
+        return;
+    }
+    
+    const confirmClear = confirm('Are you sure you want to clear all call history?');
+    if (confirmClear) {
+        callHistoryElement.innerHTML = '';
+        alert('Call history has been cleared successfully!');
+    }
+});
+
+// Initialize empty call history message
+function initializeCallHistory() {
+    if (callHistoryElement.children.length === 0) {
+        const emptyMessage = document.createElement('div');
+        emptyMessage.className = 'no-calls-message text-center text-gray-500 py-8';
+        emptyMessage.innerHTML = `
+            <i class="fa-regular fa-clock text-3xl mb-2 block"></i>
+            <p>No calls made yet</p>
+            <p class="text-sm">Your call history will appear here</p>
+        `;
+        callHistoryElement.appendChild(emptyMessage);
+    }
+}
+
+// Initialize the call history on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCallHistory();
+});
